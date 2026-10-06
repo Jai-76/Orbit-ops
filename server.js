@@ -2,8 +2,23 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const port = process.env.PORT || 4173;
 const root = __dirname;
+const loadEnv = () => {
+  const envPath = path.join(root, '.env');
+  if (!fs.existsSync(envPath)) return;
+  const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const value = trimmed.slice(eq + 1).trim().replace(/^['"]|['"]$/g, '');
+    process.env[key] = value;
+  }
+};
+loadEnv();
+const port = process.env.PORT || 4173;
 const dbFile = path.join(root, 'db.json');
 const types = { '.html':'text/html', '.css':'text/css', '.js':'text/javascript', '.json':'application/json', '.svg':'image/svg+xml' };
 const readDb = () => JSON.parse(fs.readFileSync(dbFile, 'utf8'));
@@ -17,11 +32,95 @@ const tenant = (req, db) => req.headers['x-tenant-id'] || db.currentTenant;
 function api(req,res,url) {
   const db=readDb(), t=tenant(req,db), parts=url.split('/').filter(Boolean), resource=parts[1], item=parts[2];
   if (req.method==='OPTIONS') return send(res,204,{});
+  if (url==='/api') return send(res,200,{
+    service:'orbitops-api',
+    version:'1.0.0',
+    status:'online',
+    timestamp:new Date().toISOString(),
+    endpoints:[
+      'GET /api/health',
+      'POST /api/auth/login',
+      'GET /api/auth/me',
+      'POST /api/auth/logout',
+      'GET /api/tenants',
+      'GET /api/dashboard',
+      'GET /api/employees',
+      'POST /api/employees',
+      'PATCH /api/employees/:id',
+      'DELETE /api/employees/:id',
+      'GET /api/requests',
+      'POST /api/requests',
+      'PATCH /api/requests/:id',
+      'GET /api/payroll',
+      'GET /api/activity',
+      'GET /api/members',
+      'GET /api/billing',
+      'GET /api/audit',
+      'POST /api/reports',
+      'GET /api/stats',
+      'GET /api/profile',
+      'GET /api/locations',
+      'POST /api/locations',
+      'GET /api/tools',
+      'GET /api/maps/search?query=Tokyo offices'
+    ]
+  });
   if (url==='/api/health') return send(res,200,{ok:true,service:'orbitops-api',timestamp:new Date().toISOString()});
+  if (url==='/api/config' && req.method==='GET') return send(res,200,{service:'orbitops-api', environment: process.env.NODE_ENV || 'development', port:Number(port), googleMapsConfigured: !!process.env.GOOGLE_MAPS_API_KEY, tenantId:t});
+  if (url==='/api/summary' && req.method==='GET') {
+    const employees=db.employees.filter(x=>x.tenantId===t);
+    const requests=db.requests.filter(x=>x.tenantId===t);
+    const payroll = db.payroll.filter(x=>x.tenantId===t);
+    return send(res,200,{
+      tenantId:t,
+      employees: employees.length,
+      activeEmployees: employees.filter(x=>x.status==='active').length,
+      pendingRequests: requests.filter(x=>x.status==='pending').length,
+      totalPayroll: payroll.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+      generatedAt: new Date().toISOString()
+    });
+  }
   if (url==='/api/auth/login' && req.method==='POST') return body(req).then(input=>{const email=input.email||'owner@northstar.test';const password=input.password||'demo';if(password!=='demo')return send(res,401,{error:'Invalid credentials'});const user={id:'usr_1',name:'Amara Khan',email,role:'owner',tenantId:t};return send(res,200,{user,token:signToken({...user,exp:Date.now()+86400000})})});
   if (url==='/api/auth/me' && req.method==='GET'){const user=readToken(req);return user?send(res,200,{user}):send(res,401,{error:'Authentication required'})}
   if (url==='/api/auth/logout' && req.method==='POST') return send(res,200,{ok:true,message:'Signed out'});
   if (url==='/api/tenants' && req.method==='GET') return send(res,200,{tenants:db.tenants,currentTenant:t});
+  if (url==='/api/stats' && req.method==='GET') return send(res,200,{
+    activeUsers: 1284,
+    totalRevenue: 184250,
+    conversionRate: 6.8,
+    downtime: 0.08,
+    tenantId: t,
+    generatedAt: new Date().toISOString()
+  });
+  if (url==='/api/profile' && req.method==='GET') return send(res,200,{
+    id:'usr_1',
+    name:'Amara Khan',
+    email:'owner@northstar.test',
+    role:'owner',
+    tenantId:t,
+    timezone:'Asia/Calcutta',
+    department:'Operations',
+    avatar:'AK'
+  });
+  if (url==='/api/locations' && req.method==='GET') return send(res,200,{
+    data:[
+      {id:'loc_1',name:'New York HQ',city:'New York',country:'USA',status:'active'},
+      {id:'loc_2',name:'San Francisco Studio',city:'San Francisco',country:'USA',status:'active'},
+      {id:'loc_3',name:'London Office',city:'London',country:'UK',status:'active'}
+    ]
+  });
+  if (url==='/api/locations' && req.method==='POST') return body(req).then(input=>{
+    const location={id:id('loc'),name:input.name || 'New Location',city:input.city || 'Unknown',country:input.country || 'USA',status:'active'};
+    return send(res,201,{location});
+  });
+  if (url==='/api/tools' && req.method==='GET') return send(res,200,{
+    data:[
+      {id:'slack',name:'Slack',status:'connected'},
+      {id:'notion',name:'Notion',status:'connected'},
+      {id:'hubspot',name:'HubSpot',status:'pending'},
+      {id:'calendar',name:'Google Calendar',status:'connected'}
+    ]
+  });
   if (resource==='dashboard' && req.method==='GET') {
     const employees=db.employees.filter(x=>x.tenantId===t), requests=db.requests.filter(x=>x.tenantId===t), payroll=db.payroll.filter(x=>x.tenantId===t), activities=db.activity.filter(x=>x.tenantId===t);
     return send(res,200,{tenant:db.tenants.find(x=>x.id===t), metrics:{activeEmployees:employees.filter(x=>x.status==='active').length+80,pendingRequests:requests.filter(x=>x.status==='pending').length+3,monthlyPayroll:payroll[0]?.amount||0,satisfaction:4.8}, employees, requests, payroll, activities});
@@ -48,4 +147,4 @@ function api(req,res,url) {
   if (resource==='reports' && req.method==='POST') {const employees=db.employees.filter(x=>x.tenantId===t);return send(res,200,{reportId:id('report'),generatedAt:new Date().toISOString(),summary:{employees:employees.length+80,departments:[...new Set(employees.map(x=>x.department))].length},downloadUrl:'/api/reports/latest'})}
   return send(res,404,{error:'route not found'});
 }
-http.createServer((req,res)=>{const url=req.url.split('?')[0];if(url.startsWith('/api/'))return api(req,res,url);const file=url==='/'?'/index.html':url,full=path.join(root,file);if(!full.startsWith(root)||!fs.existsSync(full)||fs.statSync(full).isDirectory()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'Content-Type':types[path.extname(full)]||'text/plain','Cache-Control':'no-store'});fs.createReadStream(full).pipe(res)}).listen(port,'0.0.0.0',()=>console.log(`OrbitOps full-stack API listening on ${port}`));
+http.createServer((req,res)=>{const url=req.url.split('?')[0];if(url === '/api' || url.startsWith('/api/'))return api(req,res,url);const file=url==='/'?'/index.html':url,full=path.join(root,file);if(!full.startsWith(root)||!fs.existsSync(full)||fs.statSync(full).isDirectory()){res.writeHead(404);return res.end('Not found')}res.writeHead(200,{'Content-Type':types[path.extname(full)]||'text/plain','Cache-Control':'no-store'});fs.createReadStream(full).pipe(res)}).listen(port,'0.0.0.0',()=>console.log(`OrbitOps full-stack API listening on ${port}`));
