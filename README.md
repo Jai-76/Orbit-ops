@@ -11,6 +11,27 @@ A polished multi-tenant HR operations dashboard starter with role-aware workspac
 - Docker + Compose for production-style container delivery
 - GitHub Actions CI/CD: syntax checks, image build and GHCR publish
 
+## Feature ideas to include
+These are the ideas that make OrbitOps feel more like a real operations platform:
+
+- Employee management with profiles, departments, roles, locations, and status badges
+- Request workflow for leave, reimbursements, equipment, and shift changes
+- Payroll dashboard with monthly payouts, deductions, bonuses, and export support
+- Office and location tracking using map search and team distribution by city or country
+- Notifications and reminders for approvals, deadlines, and important updates
+- Audit trail and governance records for employee and system actions
+- Reporting center for headcount, payroll, performance, and workspace summaries
+- Integrations with Google Workspace, Slack, Notion, calendar tools, and CRM systems
+- Role-based access control for owner, admin, manager, and employee views
+- Multi-tenant workspace settings with secure, isolated data boundaries
+
+### Recommended roadmap
+1. Add employee directory and profile editing
+2. Add leave and approval request screens
+3. Add payroll and spending summaries
+4. Add map-based office and location tracking
+5. Add admin auth, RBAC, and audit logs
+
 ## Run locally
 ```bash
 npm start
