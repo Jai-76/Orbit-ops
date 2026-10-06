@@ -1,0 +1,32 @@
+{
+  "categoryFilterWords": [
+    "accountant",
+    "accounting"
+  ],
+  "enableCompetitorAnalysis": false,
+  "includeWebResults": false,
+  "language": "en",
+  "locationQuery": "New York, USA",
+  "maxCompetitorsToAnalyze": 30,
+  "maxCrawledPlacesPerSearch": 50,
+  "maximumLeadsEnrichmentRecords": 0,
+  "scrapeContacts": false,
+  "scrapeDirectories": false,
+  "scrapeImageAuthors": false,
+  "scrapeOrderOnline": false,
+  "scrapePlaceDetailPage": false,
+  "scrapeReviewsPersonalData": true,
+  "scrapeSocialMediaProfiles": {
+    "facebooks": false,
+    "instagrams": false,
+    "tiktoks": false,
+    "twitters": false,
+    "youtubes": false
+  },
+  "scrapeTableReservationProvider": false,
+  "searchStringsArray": [
+    "restaurant"
+  ],
+  "skipClosedPlaces": false,
+  "verifyLeadsEnrichmentEmails": false
+}

@@ -1,0 +1,136 @@
+{
+  "tenants": [
+    {
+      "id": "northstar",
+      "name": "Northstar Labs",
+      "plan": "Business plan"
+    },
+    {
+      "id": "acme",
+      "name": "Acme Studio",
+      "plan": "Growth plan"
+    }
+  ],
+  "currentTenant": "northstar",
+  "employees": [
+    {
+      "id": "emp_1",
+      "tenantId": "northstar",
+      "name": "Jamie Rodriguez",
+      "email": "jamie@northstar.test",
+      "department": "Product",
+      "role": "Manager",
+      "status": "active",
+      "joined": "2024-02-18",
+      "avatar": "JR"
+    },
+    {
+      "id": "emp_2",
+      "tenantId": "northstar",
+      "name": "Mei Lin",
+      "email": "mei@northstar.test",
+      "department": "Design",
+      "role": "Designer",
+      "status": "active",
+      "joined": "2024-05-07",
+      "avatar": "ML"
+    },
+    {
+      "id": "emp_3",
+      "tenantId": "northstar",
+      "name": "Owen Smith",
+      "email": "owen@northstar.test",
+      "department": "Engineering",
+      "role": "Engineer",
+      "status": "active",
+      "joined": "2023-11-12",
+      "avatar": "OS"
+    },
+    {
+      "id": "emp_4",
+      "tenantId": "northstar",
+      "name": "Priya Shah",
+      "email": "priya@northstar.test",
+      "department": "Engineering",
+      "role": "Engineer",
+      "status": "active",
+      "joined": "2026-10-06",
+      "avatar": "PS"
+    }
+  ],
+  "requests": [
+    {
+      "id": "req_1",
+      "tenantId": "northstar",
+      "employee": "Jamie Rodriguez",
+      "type": "Vacation",
+      "start": "2026-10-07",
+      "end": "2026-10-09",
+      "days": 3,
+      "status": "pending"
+    },
+    {
+      "id": "req_2",
+      "tenantId": "northstar",
+      "employee": "Mei Lin",
+      "type": "Personal",
+      "start": "2026-10-08",
+      "end": "2026-10-08",
+      "days": 1,
+      "status": "pending"
+    },
+    {
+      "id": "req_3",
+      "tenantId": "northstar",
+      "employee": "Owen Smith",
+      "type": "Vacation",
+      "start": "2026-10-10",
+      "end": "2026-10-13",
+      "days": 4,
+      "status": "pending"
+    }
+  ],
+  "payroll": [
+    {
+      "id": "pay_1",
+      "tenantId": "northstar",
+      "month": "September 2026",
+      "amount": 42580,
+      "status": "approved"
+    }
+  ],
+  "activity": [
+    {
+      "id": "act_bb4b767f1c",
+      "tenantId": "northstar",
+      "action": "Amara added a new employee",
+      "detail": "Test User joined General",
+      "time": "just now",
+      "kind": "add"
+    },
+    {
+      "id": "act_1",
+      "tenantId": "northstar",
+      "action": "Amara added a new employee",
+      "detail": "Priya Shah joined Engineering",
+      "time": "12 min ago",
+      "kind": "add"
+    },
+    {
+      "id": "act_2",
+      "tenantId": "northstar",
+      "action": "Payroll was approved",
+      "detail": "September payroll · $42,580.00",
+      "time": "2 hrs ago",
+      "kind": "success"
+    },
+    {
+      "id": "act_3",
+      "tenantId": "northstar",
+      "action": "Policy updated",
+      "detail": "Remote work policy was changed",
+      "time": "Yesterday",
+      "kind": "update"
+    }
+  ]
+}
