@@ -1,4 +1,4 @@
-# OrbitOps
+## OrbitOps
 
 A polished multi-tenant HR operations dashboard starter with role-aware workspace navigation, responsive UI, and an invitation flow.
 
